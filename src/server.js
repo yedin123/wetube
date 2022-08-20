@@ -11,7 +11,7 @@ const logger = morgan("dev")
 app.set("views", process.cwd() + "/src/views");
 app.set("view engine", "pug");
 app.use(logger);
-
+app.use(express.urlencoded({extended:true})) // form data 받아올 수 있게 함
 app.use("/", globalRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
