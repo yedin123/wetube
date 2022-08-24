@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
-mongoose.connect("mongodb://127.0.0.1:27017/wetube", { useNewUrlParser: true, useUnifiedTopology: true }); //url + db이름
+mongoose.connect("mongodb://127.0.0.1:27017/wetube", { 
+    useNewUrlParser: true, 
+    useUnifiedTopology: true,
+    // useFindAndModify: false,
+ }); //url + db이름
 
 const handleOpen = () => console.log("Connected to DB");
 const hadleError = (error) => console.log("DB error", error);
