@@ -10,10 +10,10 @@ export const postJoin = async (req, res) => {
     const {name, email, username, password, location} = req.body;
     const userNameExists = await User.exists({username});
     if(userNameExists) 
-        return res.status(400).render("/join", {pageTitle: pageTitle, errorMessage:"This username is already taken."}); 
+        return res.status(400).render("join", {pageTitle: pageTitle, errorMessage:"This username is already taken."}); 
     const emailNameExists = await User.exists({email});
     if(emailNameExists) 
-        return res.status(400).render("/join", {pageTitle: pageTitle, errorMessage:"This email is already taken."});
+        return res.status(400).render("join", {pageTitle: pageTitle, errorMessage:"This email is already taken."});
     try{
         await User.create({
             name,
@@ -27,18 +27,41 @@ export const postJoin = async (req, res) => {
         return res.status(400).render("join", {pageTitle: pageTitle, errorMessage: error.message} );
     }
 }
-export const edit = (req, res) =>{
-    res.send("Edit User");
+export const getEdit = (req, res) =>{
+    res.render("edit-profile", {pageTitle:"Edit Profile"});
 }
-export const remove = (req, res) =>{
-    res.send("Remove User");
+export const postEdit = async (req, res) =>{
+    const pageTitle = "Edit Profile"; 
+    const {
+        session: { user: { _id, email:sessionEmail, username:sessionUsername } },
+        body: { name, email, username, location }
+    } = req;
+    //email, username 중복체크
+    if(sessionEmail != email && await User.exists({ email })){
+        return res.status(400).render("edit-profile", { pageTitle: pageTitle, errorMessage: "This email is already taken." });
+    }
+    if(sessionUsername != username && await User.exists({ username })){
+        return res.status(400).render("edit-profile", { pageTitle: pageTitle, errorMessage: "This username is already taken." });
+    }
+    const updateUser = await User.findByIdAndUpdate(
+        _id, 
+        { 
+            name,
+            email,
+            username,
+            location
+        }, 
+        {new:true}
+    );
+    req.session.user = updateUser;
+    res.redirect("/users/edit");
 }
 export const getLogin = (req, res) =>{
     res.render("login", { pageTitle: "Login" });
 }
 export const postLogin = async (req, res) =>{
     const { username, password } = req.body;
-    const user = await User.findOne({username});
+    const user = await User.findOne({username, socialOnly:false});
     console.log(password);
     console.log(user.password);
     if(!user)
@@ -102,14 +125,11 @@ export const finishGithubLogin = async (req, res) => {
         if(!emailObj){
             return res.redirect("/login");
         }
-        const existingUser = await User.findOne({email: emailObj.email});
-        if(existingUser){
-            req.session.loggedIn = true;
-            req.session.user = existingUser;    
-            return res.redirect("/")
-        } else {
+        let user = await User.findOne({email: emailObj.email});
+        if(!user){
             console.log(userData);
             const user = await User.create({
+                avatarUrl:userData.avatarUrl,
                 name: userData.name,
                 email: emailObj.email,
                 password:"",
@@ -117,17 +137,21 @@ export const finishGithubLogin = async (req, res) => {
                 socialOnly: true,
                 location: userData.location ,
             });
-            req.session.loggedIn = true;
-            req.session.user = existingUser;    
-            return res.redirect("/")
         }
+        req.session.loggedIn = true;
+        req.session.user = user;    
+        return res.redirect("/")
     } else {
         return res.redirect("/login");
     }
 
 };
 export const logout = (req, res) =>{
-    res.send("Logout");
+    req.session.destroy();
+    return res.redirect("/");
+}
+export const remove = (req, res) =>{
+    res.send("Remove User");
 }
 export const see = (req, res) =>{
     res.send("See");
