@@ -38,7 +38,6 @@ export const postEdit = async (req, res) =>{
         body: { name, email, username, location },
         file
     } = req;
-    console.log(file);
     //email, username 중복체크
     if(sessionEmail != email && await User.exists({ email })){
         return res.status(400).render("edit-profile", { pageTitle: pageTitle, errorMessage: "This email is already taken." });
@@ -67,10 +66,10 @@ export const postLogin = async (req, res) =>{
     const { username, password } = req.body;
     const user = await User.findOne({username, socialOnly:false});
     if(!user)
-        return res.status(400).render("/login", { pageTitle: "Login", errorMessage: "An account with this username does not exist." });
+        return res.status(400).render("login", { pageTitle: "Login", errorMessage: "An account with this username does not exist." });
     const ok = await bcrypt.compare(password, user.password);
     if(!ok)
-        return res.status(400).render("/login", { pageTitle: "Login", errorMessage: "Wrong password" });
+        return res.status(400).render("login", { pageTitle: "Login", errorMessage: "Wrong password" });
     req.session.loggedIn = true;
     req.session.user = user;
     return res.redirect("/");
@@ -184,11 +183,10 @@ export const postChangePassword = async (req, res) => {
   };
   export const see = async (req, res) =>{
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate("videos");
     if(!user)
         return res.status(400).render("404", { pageTitle:"User not found" });
-    const videos = await Video.find({ owner: user._id });
-    res.render("profile", {pageTitle: user.name, user, videos});
+    res.render("profile", {pageTitle: user.name, user});
 };
 export const remove = (req, res) =>{
     res.send("Remove User");
