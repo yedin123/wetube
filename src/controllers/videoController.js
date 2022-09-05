@@ -3,8 +3,8 @@ import User from "../models/User";
 
 export const home = async (req, res) => {
     try{
-        const videos = await Video.find({}).sort({createdAt:"desc"}); // await은 async 함수 안에서만 사용한다
-        return res.render("home", {pageTitle: "Home", videos})
+        const videos = await Video.find({}).sort({createdAt:"desc"}).populate("owner"); // await은 async 함수 안에서만 사용한다
+        return res.render("home", {pageTitle: "Home", videos,})
     } catch(error) {
         return res.render("server_error", {error});
     }
