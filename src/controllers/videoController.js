@@ -52,7 +52,7 @@ export const search = async (req, res) =>{
             title: {
                 $regex: new RegExp(keyword, "i") // keyword 포함하는 모든 video 가져옴
             }
-        });
+        }).populate("owner");
 
     }
     return res.render("search", {pageTitle:"Search", videos});

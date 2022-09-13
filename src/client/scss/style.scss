@@ -8,11 +8,13 @@
 @import "./components/video.scss";
 @import "./components/shared.scss";
 @import "./components/shared.scss";
+@import "./components/social-login.scss";
 @import "./components/form.scss";
 
 //screens
-@import "./screens/home.scss";
 @import "./screens/search.scss";
+@import "./screens/profile.scss";
+@import "./screens/edit-profile.scss";
 
 //default
 a {
