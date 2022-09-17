@@ -4,6 +4,7 @@ import User from "../models/User";
 export const home = async (req, res) => {
     try{
         const videos = await Video.find({}).sort({createdAt:"desc"}).populate("owner"); // await은 async 함수 안에서만 사용한다
+        console.log(videos);
         return res.render("home", {pageTitle: "Home", videos,})
     } catch(error) {
         return res.render("server_error", {error});
@@ -62,14 +63,15 @@ export const getUpload = (req, res) =>{
 }
 export const postUpload = async (req, res) =>{
     const { user: { _id } } = req.session;
-    const file = req.file;
+    const { video, thumb } = req.files;
     const { title, description, hashtags } = req.body;
     try{
     const newVideo = await Video.create({
         title,
         description,
         owner:_id,
-        fileUrl:file.path, 
+        fileUrl: video[0].path, 
+        thumbUrl: thumb[0].path.replace(/[\\]/g, "/"), 
         hashtags: Video.formatHashTags(hashtags)
     });
     const user = await User.findById(_id)
