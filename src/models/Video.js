@@ -7,6 +7,7 @@ const videoSchema = new mongoose.Schema({
     thumbUrl: {type: String, required: true},
     createdAt: {type: Date, required: true, default: Date.now}, // Date.now()라고 적으면 db에 저장되기 전 시간이 기록된다
     hashtags: [{type:String, trim: true}],
+    comments: [{type:mongoose.Schema.Types.ObjectId, required:true, ref:"Comment"}],
     meta: {
         views: {type: Number, default: 0, required: true},
         rating: {type: Number, default: 0, required: true},

@@ -1,4 +1,5 @@
 import express from "express";
+import flash from "express-flash";
 import morgan from "morgan";
 import session from "express-session";
 import MongoStore from "connect-mongo";
@@ -18,8 +19,8 @@ app.use((req, res, next) => {
     next();
     });
 app.use(logger);
-app.use(express.urlencoded({extended:true})) // form data 받아올 수 있게 함
-
+app.use(express.urlencoded({extended:true})); // form data 받아올 수 있게 함
+app.use(express.json());
 app.use(
     session({ // route 위에 있어야함
         secret: "Hello",
@@ -28,6 +29,7 @@ app.use(
         store: MongoStore.create({mongoUrl: process.env.DB_URL})
     })
 );
+app.use(flash());
 app.use(localsMiddleware);
 app.use("/uploads", express.static("uploads"));
 app.use("/static", express.static("assets"));
