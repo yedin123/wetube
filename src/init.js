@@ -5,10 +5,10 @@ import "./models/User";
 import "./models/Comment";
 import app from "./server";
 
-const PORT = process.env.PORT || 8080;
+const port  = process.env.PORT || 8080;
 
 const handleListening = () => {
-    console.log(`Server listening on port http://localhost:${PORT}`);
+    console.log(`Server listening on port http://localhost:${port }`);
 }
 
-app.listen(PORT, handleListening);
+app.listen(port , handleListening);
