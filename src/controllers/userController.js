@@ -44,10 +44,12 @@ export const postEdit = async (req, res) =>{
     if(sessionUsername != username && await User.exists({ username })){
         return res.status(400).render("edit-profile", { pageTitle: pageTitle, errorMessage: "This username is already taken." });
     }
+
+    const isHeroku = process.env.NODE_ENV==="production";
     const updateUser = await User.findByIdAndUpdate(
         _id, 
         { 
-            avatarUrl: file ? file.location : avatarUrl,
+            avatarUrl: file ? (isHeroku ? file.location : file.path) : avatarUrl,
             name,
             email,
             username,
